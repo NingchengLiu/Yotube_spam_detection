@@ -33,6 +33,27 @@ Feature ablation from the presentation:
 | RoBERTa only | 94.83% | 94.85% | 98.64% |
 | Hybrid | 96.88% | 96.91% | 99.31% |
 
+## Reproduced KaggleHub Run
+
+Using `ahsenwaheed/youtube-comments-spam-dataset`, the prepared dataset contains 1,956 comments:
+
+| Class | Count |
+| --- | ---: |
+| Non-spam (`0`) | 951 |
+| Spam (`1`) | 1,005 |
+
+Live results from the repository code with an 80/20 stratified split:
+
+| Feature set / classifier | Accuracy | Precision | Recall | F1 | ROC-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| TF-IDF / Logistic Regression | 94.90% | 96.41% | 93.53% | 94.95% | 98.77% |
+| TF-IDF / Random Forest | 96.17% | 97.45% | 95.02% | 96.22% | 98.90% |
+| TF-IDF / XGBoost | 94.39% | 94.97% | 94.03% | 94.50% | 98.22% |
+| TF-IDF / LightGBM | 95.15% | 95.96% | 94.53% | 95.24% | 98.32% |
+| TF-IDF / Soft-vote ensemble | 94.90% | 95.02% | 95.02% | 95.02% | 98.97% |
+| RoBERTa / Logistic Regression | 95.41% | 95.98% | 95.02% | 95.50% | 99.27% |
+| Hybrid / Soft-vote ensemble | 96.17% | 97.45% | 95.02% | 96.22% | 99.64% |
+
 ## Architecture
 
 ```text
