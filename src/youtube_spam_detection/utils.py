@@ -35,13 +35,24 @@ def load_comment_dataset(path: str, columns: DatasetColumns | None = None) -> pd
     """Load a CSV dataset and return normalized CONTENT and CLASS columns."""
     selected = columns or DatasetColumns()
     frame = pd.read_csv(path)
+    resolved_text = _resolve_column(frame, selected.text)
+    resolved_label = _resolve_column(frame, selected.label)
 
-    missing = {selected.text, selected.label}.difference(frame.columns)
-    if missing:
-        expected = ", ".join(sorted(missing))
-        raise ValueError(f"Missing required column(s): {expected}")
+    result = frame[[resolved_text, resolved_label]].copy()
+    result[resolved_text] = result[resolved_text].map(clean_comment)
+    result[resolved_label] = result[resolved_label].astype(int)
+    return result.rename(columns={resolved_text: TEXT_COLUMN, resolved_label: LABEL_COLUMN})
 
-    result = frame[[selected.text, selected.label]].copy()
-    result[selected.text] = result[selected.text].map(clean_comment)
-    result[selected.label] = result[selected.label].astype(int)
-    return result.rename(columns={selected.text: TEXT_COLUMN, selected.label: LABEL_COLUMN})
+
+def _resolve_column(frame: pd.DataFrame, expected: str) -> str:
+    """Resolve a dataset column using exact or case-insensitive matching."""
+    if expected in frame.columns:
+        return expected
+
+    normalized = {str(column).strip().lower(): column for column in frame.columns}
+    match = normalized.get(expected.lower())
+    if match is not None:
+        return str(match)
+
+    available = ", ".join(map(str, frame.columns))
+    raise ValueError(f"Missing required column '{expected}'. Available columns: {available}")

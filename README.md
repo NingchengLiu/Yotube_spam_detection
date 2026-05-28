@@ -52,23 +52,25 @@ The implementation keeps RoBERTa optional so the TF-IDF baseline can run on mach
 
 ```text
 .
-├── README.md
-├── requirements.txt
-├── src/
-│   └── youtube_spam_detection/
-│       ├── __init__.py
-│       ├── features.py
-│       ├── train.py
-│       └── utils.py
-└── tests/
-    └── test_utils.py
+|-- README.md
+|-- requirements.txt
+|-- requirements-optional.txt
+|-- scripts/
+|   `-- download_dataset.py
+|-- src/
+|   `-- youtube_spam_detection/
+|       |-- __init__.py
+|       |-- features.py
+|       |-- train.py
+|       `-- utils.py
+`-- tests/
+    `-- test_utils.py
 ```
 
 ## Data
 
-The documents cite two Kaggle sources:
+The project uses the KaggleHub dataset:
 
-- Competition dataset: https://www.kaggle.com/competitions/detect-spam-youtube-comment/data
 - Extended public dataset: https://www.kaggle.com/datasets/ahsenwaheed/youtube-comments-spam-dataset
 
 Expected columns:
@@ -104,30 +106,50 @@ For hybrid RoBERTa features, also install PyTorch and Transformers:
 python -m pip install -r requirements-optional.txt
 ```
 
+## Download Data
+
+```bash
+python scripts/download_dataset.py
+```
+
+This uses:
+
+```python
+import kagglehub
+
+path = kagglehub.dataset_download("ahsenwaheed/youtube-comments-spam-dataset")
+```
+
+The script combines all matching CSV files into:
+
+```text
+data/youtube_comments_spam.csv
+```
+
 ## Usage
 
 Run the TF-IDF baseline:
 
 ```bash
-python -m youtube_spam_detection.train --data data/youtube_spam.csv --feature-set tfidf
+python -m youtube_spam_detection.train --data data/youtube_comments_spam.csv --feature-set tfidf
 ```
 
 Run RoBERTa-only features:
 
 ```bash
-python -m youtube_spam_detection.train --data data/youtube_spam.csv --feature-set roberta
+python -m youtube_spam_detection.train --data data/youtube_comments_spam.csv --feature-set roberta
 ```
 
 Run the hybrid feature model:
 
 ```bash
-python -m youtube_spam_detection.train --data data/youtube_spam.csv --feature-set hybrid
+python -m youtube_spam_detection.train --data data/youtube_comments_spam.csv --feature-set hybrid
 ```
 
 Save a fitted pipeline:
 
 ```bash
-python -m youtube_spam_detection.train --data data/youtube_spam.csv --feature-set tfidf --model-out artifacts/tfidf_model.joblib
+python -m youtube_spam_detection.train --data data/youtube_comments_spam.csv --feature-set tfidf --model-out artifacts/tfidf_model.joblib
 ```
 
 ## Model Choices
